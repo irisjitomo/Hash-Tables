@@ -56,20 +56,26 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-
+        current = self.storage[index]
         # check for Linked List
         if self.storage[index] is not None:
-            current = self.storage[index]
         # if yes, check to see if it is key
-            while current and True:
         # if key, update it
-                if current.key == key:
-                    current.value = value
-        # if not found, make new node for key
-                elif current.key is None:
-                    current.next = LinkedPair(key, value)
+            newPair = LinkedPair(key, value)
+            newPair.next = self.storage[index]
+            self.storage[index] = newPair
         else:
             self.storage[index] = LinkedPair(key, value)
+
+        return
+
+        # if self.storage[index] is not None:
+        #     print(f'WARNING: COLLISION HAS OCCURED at {index}')
+            
+        # else:
+        #     self.storage[index] = (key, value)
+        
+        # return
 
 
 
@@ -82,13 +88,21 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
+        current = self.storage[index]
+        prev = None
 
-        if self.storage[index] is None:
-            print('key not found')
-            return
-        else:
-            return self.storage[index].value = None
+        if current.key == key:
+            self.storage[index] = current.next
+        if current.key != key:
+            while current.next is not None:
+                prev = current
+                current = current.next
+                if current.key == key:
+                    prev.next = current.next
+                    return None
+            print(f'the key {key} was not found!')
         
+        # return
 
 
     def retrieve(self, key):
@@ -100,10 +114,18 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
+        current = self.storage[index]
 
-        if self.storage[index] is None:
+        if current is not None:
+            while current:
+                if current.key is key:
+                    return current.value
+                elif current.next is not None:
+                    # we have to look at the .next  in the index where collision is
+                    # print(f'WARNING: COLLISION HAS OCCURED at {index}')
+                    current = current.next
+        else:
             return None
-        return self.storage[index].value
 
 
     def resize(self):
@@ -113,11 +135,26 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        old_storage = self.storage
+        self.capacity *= 2
+        self.storage = [None] * self.capacity
+        current = None
+        for item in old_storage:
+            current = item
+            while current:
+                self.insert(current.key, current.value)
+                current = current.next
 
 
 
 if __name__ == "__main__":
+    # ht1 = HashTable(2)
+
+    # ht1.insert("key1", 'hello')
+    # ht1.insert("unicorn", 'goodbye')
+    # ht1.remove('key1')
+
+    # print(ht1.storage)
     ht = HashTable(2)
 
     ht.insert("line_1", "Tiny hash table")
